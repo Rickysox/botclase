@@ -1,12 +1,16 @@
 //Dependencias
 const Discord = require("discord.js");
 const config = require("./config.json");
+//Para poder mandar imagenes
+const { MessageAttachment } = require("discord.js");
 
 //Creamos un Discord.Client nuevo, y le damos la opcion de recibir mensajes del servidor
 const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]});
 
 //Prefijo para el bot
 const prefix = "!";
+
+
 
 //El metodo .on, hace que discord nos envie una notificacion sobre los eventos nuevos, recibe 2 parametros
 //el nombre del evento, y la funcion a realizar cuando pasa dicho evento
@@ -35,8 +39,27 @@ client.on("messageCreate", function(message) {
         const timeTaken = Date.now() - message.createdTimestamp;
         
         //Con el metodo reply, responde al usuario que haya escrito el comando
-        message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
+        message.channel.send(`Pong! This message had a latency of ${timeTaken}ms.`);
+        //Emoji
+        message.react('🤔');
+        //Prueba imagen
+        const attachment = new MessageAttachment('logo.png'); //ex. https://i.imgur.com/random.jpg
+        message.channel.send({files: [attachment] })
+
     }  
+
+    //Comprobamos si la constante command coincide con el valor sum, si coincide procede a ejecutar el codigo.
+    else if (command === "sum") {
+
+        //Aqui con map y parseFloat, creamos una nueva array de ints, usando los strings en la array de args
+        const numArgs = args.map(x => parseFloat(x));
+
+        //Aqui con reduce, counter siendo el valor anterior y x el valor actual, le decimos que el valor anterior sera, este mismo mas el valor actual
+        const sum = numArgs.reduce((counter, x) => counter += x);
+
+        //Con el metodo reply, responde al usuario que haya escrito el comando
+        message.reply(`The sum of all the arguments you provided is ${sum}!`);
+    }
 });
 
 client.login(config.BOT_TOKEN);
