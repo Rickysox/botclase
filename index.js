@@ -14,7 +14,7 @@ const prefix = "!";
 
 //El metodo .on, hace que discord nos envie una notificacion sobre los eventos nuevos, recibe 2 parametros
 //el nombre del evento, y la funcion a realizar cuando pasa dicho evento
-client.on("messageCreate", function(message) { 
+client.on("messageCreate", async function(message) { 
 
     //Aqui comprueba si el mensaje es de un bot o no, si es de un bot, para el processo
     if (message.author.bot) return;
@@ -35,16 +35,54 @@ client.on("messageCreate", function(message) {
     //Comprobamos si la constante command coincide con el valor ping, si coincide procede a ejecutar el codigo.
     if (command === "ping") {
 
+        /*const num = Math.floor(Math.random() * 3) + 1;
+
+        switch(num){
+            case 1:
+                const attachment = new MessageAttachment('https://cdn.mcr.ea.com/3/images/ac394369-2801-4e09-87eb-82ca54e26254/1588018258-0x0-0-0.jpg'); 
+                const sentMessage = await message.channel.send({files: [attachment] })
+                await sentMessage.react('🤔');
+                await sentMessage.react('😃');
+                break;
+            case 2:
+                const attachment2 = new MessageAttachment('https://i.ytimg.com/vi/Y05wiQQbFLU/maxresdefault.jpg'); 
+                const sentMessage2 = await message.channel.send({files: [attachment2] })
+                await sentMessage2.react('🤔');
+                await sentMessage2.react('😃');
+                break;
+            case 3:
+                const attachment3 = new MessageAttachment('https://i.3djuegos.com/juegos/2703/mirror_s_edge/fotos/set/mirror_s_edge-584992.jpg'); 
+                const sentMessage3 = await message.channel.send({files: [attachment3] })
+                await sentMessage3.react('🤔');
+                await sentMessage3.react('😃');
+                break;
+            default:
+                message.channel.send("Uhh")
+        }*/
+
+        //Imagen
+        const attachment = new MessageAttachment('https://cdn.mcr.ea.com/3/images/ac394369-2801-4e09-87eb-82ca54e26254/1588018258-0x0-0-0.jpg'); 
+        const sentMessage = await message.channel.send({files: [attachment] })
+        sentMessage.react('👍');
+        //sentMessage.react('👎');
+        const filter = (reaction, user) => {
+            return reaction.emoji.name === '👍' && user.id === message.author.id;
+        };
+        const collector = sentMessage.createReactionCollector(filter, { time: 15000 });
+        collector.on('collect', (reaction, user) => {
+            message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
+        });
+
+        collector.on('end', collected => {
+            message.channel.send(`Collected ${collected.size} items`);
+            console.log(`Collected ${collected.size} items`);
+        });
+
         //Aqui a partir de la fecha actual y cuando se creo el mensaje, calculamos lo que tarda en mandar el bot su mensaje en milisegundos
         const timeTaken = Date.now() - message.createdTimestamp;
         
         //Con el metodo reply, responde al usuario que haya escrito el comando
         message.channel.send(`Pong! This message had a latency of ${timeTaken}ms.`);
-        //Emoji
-        message.react('🤔');
-        //Prueba imagen
-        const attachment = new MessageAttachment('logo.png'); //ex. https://i.imgur.com/random.jpg
-        message.channel.send({files: [attachment] })
 
     }  
 
