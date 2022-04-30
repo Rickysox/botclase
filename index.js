@@ -1,11 +1,14 @@
 //Dependencias
 const Discord = require("discord.js");
 const config = require("./config.json");
+
 //Para poder mandar imagenes
 const { MessageAttachment } = require("discord.js");
 
 //Creamos un Discord.Client nuevo, y le damos la opcion de recibir mensajes del servidor
-const client = new Discord.Client({intents: ["GUILDS", "GUILD_MESSAGES"]});
+const client = new Discord.Client({
+    intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS', 'GUILD_MESSAGE_REACTIONS']
+});
 
 //Prefijo para el bot
 const prefix = "!";
@@ -66,9 +69,9 @@ client.on("messageCreate", async function(message) {
         sentMessage.react('👍');
         //sentMessage.react('👎');
         const filter = (reaction, user) => {
-            return reaction.emoji.name === '👍' && user.id === message.author.id;
+             return reaction.emoji.name === '👍' && !user.bot;
         };
-        const collector = sentMessage.createReactionCollector(filter, { time: 15000 });
+        const collector = sentMessage.createReactionCollector({filter, max: 2,  time: 15000 });
         collector.on('collect', (reaction, user) => {
             message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
         });
@@ -77,6 +80,7 @@ client.on("messageCreate", async function(message) {
             message.channel.send(`Collected ${collected.size} items`);
             console.log(`Collected ${collected.size} items`);
         });
+        
 
         //Aqui a partir de la fecha actual y cuando se creo el mensaje, calculamos lo que tarda en mandar el bot su mensaje en milisegundos
         const timeTaken = Date.now() - message.createdTimestamp;
