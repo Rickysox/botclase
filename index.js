@@ -1,6 +1,7 @@
 //Dependencias
 const Discord = require("discord.js");
 const config = require("./config.json");
+const fetch = require("node-fetch");
 
 //Para poder mandar imagenes
 const { MessageAttachment } = require("discord.js");
@@ -13,6 +14,7 @@ const client = new Discord.Client({
 //Prefijo para el bot
 const prefix = "!";
 
+const imagenes = ["https://www.geekmi.news/__export/1644190196029/sites/debate/img/2022/02/06/zenitsu4.jpg_976912859.jpg","https://ae01.alicdn.com/kf/H37b625344181443798198e6c5b21c87e6.jpg", "https://areajugones.sport.es/wp-content/uploads/2021/05/imagen-2021-05-22-135309.jpg"]
 
 
 //El metodo .on, hace que discord nos envie una notificacion sobre los eventos nuevos, recibe 2 parametros
@@ -35,39 +37,17 @@ client.on("messageCreate", async function(message) {
     //despues con toLowerCase, lo pasamos a minusculas, ya que los comandos de los bots no son sensible a las caps
     const command = args.shift().toLowerCase();
 
+    
     //Comprobamos si la constante command coincide con el valor ping, si coincide procede a ejecutar el codigo.
     if (command === "ping") {
 
-        /*const num = Math.floor(Math.random() * 3) + 1;
-
-        switch(num){
-            case 1:
-                const attachment = new MessageAttachment('https://cdn.mcr.ea.com/3/images/ac394369-2801-4e09-87eb-82ca54e26254/1588018258-0x0-0-0.jpg'); 
-                const sentMessage = await message.channel.send({files: [attachment] })
-                await sentMessage.react('🤔');
-                await sentMessage.react('😃');
-                break;
-            case 2:
-                const attachment2 = new MessageAttachment('https://i.ytimg.com/vi/Y05wiQQbFLU/maxresdefault.jpg'); 
-                const sentMessage2 = await message.channel.send({files: [attachment2] })
-                await sentMessage2.react('🤔');
-                await sentMessage2.react('😃');
-                break;
-            case 3:
-                const attachment3 = new MessageAttachment('https://i.3djuegos.com/juegos/2703/mirror_s_edge/fotos/set/mirror_s_edge-584992.jpg'); 
-                const sentMessage3 = await message.channel.send({files: [attachment3] })
-                await sentMessage3.react('🤔');
-                await sentMessage3.react('😃');
-                break;
-            default:
-                message.channel.send("Uhh")
-        }*/
+      
 
         //Imagen
-        const attachment = new MessageAttachment('https://cdn.mcr.ea.com/3/images/ac394369-2801-4e09-87eb-82ca54e26254/1588018258-0x0-0-0.jpg'); 
+        const attachment = new MessageAttachment(imagenes[Math.floor(Math.random() * imagenes.length)]); 
         const sentMessage = await message.channel.send({files: [attachment] })
         sentMessage.react('👍');
-        //sentMessage.react('👎');
+        sentMessage.react('👎');
         const filter = (reaction, user) => {
              return reaction.emoji.name === '👍' && !user.bot;
         };
@@ -78,9 +58,12 @@ client.on("messageCreate", async function(message) {
 
         collector.on('end', collected => {
             message.channel.send(`Collected ${collected.size} items`);
-            console.log(`Collected ${collected.size} items`);
         });
         
+
+        //fetch prueba
+        const response = await fetch("https://opentdb.com/api.php?amount=1");
+        console.log(response);
 
         //Aqui a partir de la fecha actual y cuando se creo el mensaje, calculamos lo que tarda en mandar el bot su mensaje en milisegundos
         const timeTaken = Date.now() - message.createdTimestamp;
