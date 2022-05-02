@@ -65,9 +65,13 @@ client.on("messageCreate", async function(message) {
         
 
         //fetch prueba
-        const response = await fetch("https://opentdb.com/api.php?amount=1");
+        const response = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
         const data = await response.json();
         const nombre = data.results[0].question;
+        const respuesta1 = data.results[0].correct_answer;
+        const respuesta2 = data.results[0].incorrect_answers[0];
+        const respuesta3 = data.results[0].incorrect_answers[1];
+        const respuesta4 = data.results[0].incorrect_answers[2];
         console.log(nombre)
         console.log(data)
         console.log(data.results[0].incorrect_answers)
@@ -78,25 +82,31 @@ client.on("messageCreate", async function(message) {
                 .addFields(
                     { name: "Pregunta", value: `${nombre}` },
                     { name: '\u200B', value: '\u200B' },
-                    { name: ' Respuesta 1', value: 'Some value here', inline: true },
-                    { name: 'Respuesta 2', value: 'Some value here', inline: true },
+                    { name: ' Respuesta 1️⃣', value: `${respuesta1}`, inline: true },
+                    { name: 'Respuesta 2️⃣', value: `${respuesta2}`, inline: true },
                     { name: '\u200B', value: '\u200B' },
-                    { name: 'Respuesta 2', value: 'Some value here', inline: true },
-                    { name: 'Respuesta 2', value: 'Some value here', inline: true },
+                    { name: 'Respuesta 3️⃣', value: `${respuesta3}`, inline: true },
+                    { name: 'Respuesta 4️⃣', value: `${respuesta4}`, inline: true },
                 )
                 //.addField('Inline field title', 'Some value here', true)
                 .setImage(imagenes[Math.floor(Math.random() * imagenes.length)])
 
                 const sentEmbed = await message.channel.send({ embeds: [exampleEmbed] });
+                sentEmbed.react('1️⃣');
+                sentEmbed.react('2️⃣');
+                sentEmbed.react('3️⃣');
+                sentEmbed.react('4️⃣');
 
-                sentEmbed.react('👍');
-                sentEmbed.react('👎');
-        const filter = (reaction, user) => {
-             return reaction.emoji.name === '👍' && !user.bot;
+
+            const filter = (reaction, user) => {
+             return reaction.emoji.name === '1️⃣' && user.id === message.author.id && !user.bot;
         };
         const collector = sentEmbed.createReactionCollector({filter, max: 2,  time: 15000 });
         collector.on('collect', (reaction, user) => {
             message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
+            const usuario = `${user.tag}`;
+            message.channel.send(usuario)
+
         });
 
         collector.on('end', collected => {
