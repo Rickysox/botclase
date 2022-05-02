@@ -3,8 +3,11 @@ const Discord = require("discord.js");
 const config = require("./config.json");
 const fetch = require("node-fetch");
 
+
 //Para poder mandar imagenes
 const { MessageAttachment } = require("discord.js");
+const { MessageEmbed } = require('discord.js');
+
 
 //Creamos un Discord.Client nuevo, y le damos la opcion de recibir mensajes del servidor
 const client = new Discord.Client({
@@ -43,7 +46,7 @@ client.on("messageCreate", async function(message) {
 
       
 
-        //Imagen
+       /* //Imagen
         const attachment = new MessageAttachment(imagenes[Math.floor(Math.random() * imagenes.length)]); 
         const sentMessage = await message.channel.send({files: [attachment] })
         sentMessage.react('👍');
@@ -58,12 +61,47 @@ client.on("messageCreate", async function(message) {
 
         collector.on('end', collected => {
             message.channel.send(`Collected ${collected.size} items`);
-        });
+        });*/
         
 
         //fetch prueba
         const response = await fetch("https://opentdb.com/api.php?amount=1");
-        console.log(response);
+        const data = await response.json();
+        const nombre = data.results[0].question;
+        console.log(nombre)
+        console.log(data)
+        console.log(data.results[0].incorrect_answers)
+
+        const exampleEmbed = new MessageEmbed()
+                .setColor('#0099ff') 
+                //.setThumbnail('https://estaticos-cdn.prensaiberica.es/clip/38ee5ece-3c7e-462f-a0a9-c0dea50a66ff_9-16-aspect-ratio_default_0.jpg')
+                .addFields(
+                    { name: "Pregunta", value: `${nombre}` },
+                    { name: '\u200B', value: '\u200B' },
+                    { name: ' Respuesta 1', value: 'Some value here', inline: true },
+                    { name: 'Respuesta 2', value: 'Some value here', inline: true },
+                    { name: '\u200B', value: '\u200B' },
+                    { name: 'Respuesta 2', value: 'Some value here', inline: true },
+                    { name: 'Respuesta 2', value: 'Some value here', inline: true },
+                )
+                //.addField('Inline field title', 'Some value here', true)
+                .setImage(imagenes[Math.floor(Math.random() * imagenes.length)])
+
+                const sentEmbed = await message.channel.send({ embeds: [exampleEmbed] });
+
+                sentEmbed.react('👍');
+                sentEmbed.react('👎');
+        const filter = (reaction, user) => {
+             return reaction.emoji.name === '👍' && !user.bot;
+        };
+        const collector = sentEmbed.createReactionCollector({filter, max: 2,  time: 15000 });
+        collector.on('collect', (reaction, user) => {
+            message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
+        });
+
+        collector.on('end', collected => {
+            message.channel.send(`Collected ${collected.size} items`);
+        });
 
         //Aqui a partir de la fecha actual y cuando se creo el mensaje, calculamos lo que tarda en mandar el bot su mensaje en milisegundos
         const timeTaken = Date.now() - message.createdTimestamp;
