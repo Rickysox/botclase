@@ -2,6 +2,7 @@
 const Discord = require("discord.js");
 const config = require("./config.json");
 const fetch = require("node-fetch");
+const preguntas = require("./preguntas.json");
 
 
 //Para poder mandar imagenes
@@ -17,7 +18,7 @@ const client = new Discord.Client({
 //Prefijo para el bot
 const prefix = "!";
 
-const imagenes = ["https://www.geekmi.news/__export/1644190196029/sites/debate/img/2022/02/06/zenitsu4.jpg_976912859.jpg","https://ae01.alicdn.com/kf/H37b625344181443798198e6c5b21c87e6.jpg", "https://areajugones.sport.es/wp-content/uploads/2021/05/imagen-2021-05-22-135309.jpg"]
+const imagenes = ["https://www.geekmi.news/__export/1644190196029/sites/debate/img/2022/02/06/zenitsu4.jpg_976912859.jpg","https://esports.as.com/2019/08/22/league-of-legends/tacticas-maestras--tft/Aatrox-Buff_1275182479_245676_1440x810.jpg", "https://areajugones.sport.es/wp-content/uploads/2021/05/imagen-2021-05-22-135309.jpg"]
 
 
 //El metodo .on, hace que discord nos envie una notificacion sobre los eventos nuevos, recibe 2 parametros
@@ -41,44 +42,35 @@ client.on("messageCreate", async function(message) {
     const command = args.shift().toLowerCase();
 
     
+    
     //Comprobamos si la constante command coincide con el valor ping, si coincide procede a ejecutar el codigo.
     if (command === "ping") {
 
-      
+      const i = Math.floor(Math.random() * 3);
 
-       /* //Imagen
-        const attachment = new MessageAttachment(imagenes[Math.floor(Math.random() * imagenes.length)]); 
-        const sentMessage = await message.channel.send({files: [attachment] })
-        sentMessage.react('👍');
-        sentMessage.react('👎');
-        const filter = (reaction, user) => {
-             return reaction.emoji.name === '👍' && !user.bot;
-        };
-        const collector = sentMessage.createReactionCollector({filter, max: 2,  time: 15000 });
-        collector.on('collect', (reaction, user) => {
-            message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
-        });
+      const array = preguntas.preguntas[i].respuestas;
 
-        collector.on('end', collected => {
-            message.channel.send(`Collected ${collected.size} items`);
-        });*/
-        
+      let shuffled = array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value)
 
         //fetch prueba
-        const response = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
-        const data = await response.json();
-        const nombre = data.results[0].question;
-        const respuesta1 = data.results[0].correct_answer;
-        const respuesta2 = data.results[0].incorrect_answers[0];
-        const respuesta3 = data.results[0].incorrect_answers[1];
-        const respuesta4 = data.results[0].incorrect_answers[2];
-        console.log(nombre)
-        console.log(data)
-        console.log(data.results[0].incorrect_answers)
+        //const response = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
+        //const data = await response.json();
+        const nombre = preguntas.preguntas[i].pregunta;
+        const respuestaCorrecta = preguntas.preguntas[i].respuestaCorrecta;
+        const respuesta1 = shuffled[0];
+        const respuesta2 = shuffled[1];
+        const respuesta3 = shuffled[2];
+        const respuesta4 = shuffled[3];
+        console.log(preguntas.preguntas)
+        //console.log(nombre)
+        //console.log(data)
+        //console.log(data.results[0].incorrect_answers)
 
         const exampleEmbed = new MessageEmbed()
                 .setColor('#0099ff') 
-                //.setThumbnail('https://estaticos-cdn.prensaiberica.es/clip/38ee5ece-3c7e-462f-a0a9-c0dea50a66ff_9-16-aspect-ratio_default_0.jpg')
                 .addFields(
                     { name: "Pregunta", value: `${nombre}` },
                     { name: '\u200B', value: '\u200B' },
@@ -99,13 +91,46 @@ client.on("messageCreate", async function(message) {
 
 
             const filter = (reaction, user) => {
-             return reaction.emoji.name === '1️⃣' && user.id === message.author.id && !user.bot;
+             return (reaction.emoji.name === '1️⃣' || reaction.emoji.name === '2️⃣'  || reaction.emoji.name === '3️⃣'  || reaction.emoji.name === '4️⃣') && user.id === message.author.id && !user.bot;
         };
-        const collector = sentEmbed.createReactionCollector({filter, max: 2,  time: 15000 });
+        const collector = sentEmbed.createReactionCollector({filter, max: 4,  time: 7000 });
         collector.on('collect', (reaction, user) => {
+
             message.channel.send(`Collected ${reaction.emoji.name} from ${user.tag}`);
             const usuario = `${user.tag}`;
             message.channel.send(usuario)
+
+            switch(reaction.emoji.name){
+                
+                case '1️⃣':
+                    if(respuesta1 === respuestaCorrecta)
+                        message.channel.send("Bien 1")
+                    else{
+                        message.channel.send("Mal")
+                    }
+                    break;
+                case '2️⃣':
+                    if(respuesta2 === respuestaCorrecta)
+                        message.channel.send("Bien 2")
+                    else{
+                        message.channel.send("Mal")
+                    }
+                    break;
+                case '3️⃣':
+                    if(respuesta3 === respuestaCorrecta)
+                        message.channel.send("Bien 3")
+                    else{
+                        message.channel.send("Mal")
+                    }
+                    break;
+                case '4️⃣':
+                    if(respuesta4 === respuestaCorrecta)
+                        message.channel.send("Bien 4")
+                    else{
+                        message.channel.send("Mal")
+                    }
+                    break;
+            }
 
         });
 
@@ -121,18 +146,6 @@ client.on("messageCreate", async function(message) {
 
     }  
 
-    //Comprobamos si la constante command coincide con el valor sum, si coincide procede a ejecutar el codigo.
-    else if (command === "sum") {
-
-        //Aqui con map y parseFloat, creamos una nueva array de ints, usando los strings en la array de args
-        const numArgs = args.map(x => parseFloat(x));
-
-        //Aqui con reduce, counter siendo el valor anterior y x el valor actual, le decimos que el valor anterior sera, este mismo mas el valor actual
-        const sum = numArgs.reduce((counter, x) => counter += x);
-
-        //Con el metodo reply, responde al usuario que haya escrito el comando
-        message.reply(`The sum of all the arguments you provided is ${sum}!`);
-    }
 });
 
 client.login(config.BOT_TOKEN);
